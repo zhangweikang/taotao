@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.taotao.sso.mapper.UserMapper">
+
+	<select id="queryByWhere" resultType="User">
+		SELECT * FROM tb_user
+		<where>
+			<choose>
+				<when test="type == 1">username = #{param}</when>
+				<when test="type == 2">phone = #{param}</when>
+				<when test="type == 3">email = #{param}</when>
+				<!-- 非法Type，报错出来 -->
+				<otherwise>ERROR</otherwise>
+			</choose>
+		</where>
+	</select>
+	
+	<insert id="saveUser" parameterType="User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO tb_user (
+			id,
+			username,
+			password,
+			phone,
+			email,
+			created,
+			updated
+		)
+		VALUES
+			(
+				NULL,
+				#{username},
+				#{password},
+				#{phone},
+				#{email},
+				NOW(),
+				NOW()
+			);
+	</insert>
+
+	<!--  通过手机号查找用户=-->
+	<select id="queryUserByPhone" resultType="User">
+		SELECT * FROM tb_user where phone = #{phone}
+	</select>
+	<!--通过用户id更改密码  -->
+	<update id="updatePasswordById" parameterType="String">
+		update tb_user set password  = #{password} where id =#{id}
+	
+	</update>
+	
+	<!--通过用户id查询资料  -->
+	<select id="queryInfoByUserId" resultType="UserVo">
+		select * from tb_userinfo where userId = #{id}
+	</select>
+	
+	<!--新建用户查询资料  -->
+	<insert id="saveUserInfo" parameterType="UserVo" useGeneratedKeys="true" keyProperty="userId" keyColumn="userId">
+		INSERT INTO tb_userinfo (
+			userId,
+			nickName,
+			realName,
+			sex,
+			birthday,
+			province,
+			city,
+			county,
+			address
+		)
+		VALUES
+			(
+				#{userId},
+				#{nickName},
+				#{realName},
+				#{sex},
+				#{birthday},
+				#{province},
+				#{city},
+				#{county},
+				#{address}
+			);
+	</insert>
+	
+	<!--修改用户查询资料  -->
+	<update id="updateUserInfo" parameterType="UserVo" useGeneratedKeys="true" keyProperty="userId" keyColumn="userId">
+		update tb_userinfo set 
+			nickName = #{nickName},
+			realName = #{realName},
+			sex = #{sex},
+			birthday = #{birthday},
+			province = #{province},
+			city = #{city},
+			county = #{county},
+			address=#{address}
+		where userId = #{userId}
+		
+	</update>
+
+</mapper>
